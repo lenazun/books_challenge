@@ -4,114 +4,98 @@ import shlex
 
 library = {}
 
+
 def addBook(title, author):
 	if title not in library.keys():
 		library[title] = [author, 'unread']
-		print 'Added "' + title + '" by ' + author
+		print 'Added "{}" by {}.'.format(title, author) 
 	else:
-		print "That title is already in your library!"
+		print 'The book "{}" is already in your library.'.format(title)
 
 def markRead(title):
 	if title in library.keys():
 		library[title][1] = 'read'
-		print 'You\'ve read "' + title + '"'
+		print 'You\'ve read "{}"'.format(title) 
 	else:
-		print "That title is not in your library. Add it first!"
+		print 'The book "{}" is not in your library. Add it first!'.format(title) 
 
-def showAll():
-	if len(library.keys()) > 0:
-		for title, record in library.items():
-			print '"' + title + '" by ' + record[0] +  ' (' + record[1] + ')'
+def show(status, author):
+
+	if len(library.keys()) == 0:
+		print "Your library is empty."
+
 	else:
-		print "Your library is empty"
+		if author != 'all' and status != 'all':
+			to_print = {title:record for (title, record) in library.iteritems() if record[0] == author and record[1] == status}
+		elif author != 'all':
+			to_print = {title:record for (title, record) in library.iteritems() if record[0] == author}
+		elif status != 'all':	
+			to_print = {title:record for (title, record) in library.iteritems() if record[1] == status}
 
-def showUnread():
+		else:
+			to_print = library
 
-	count = 0
-	for title, record in library.items():
-		if record[1] == 'unread':
-			print '"' + title + '" by ' + record[0] +  ' (' + record[1] + ')'
-			count += 1
+		count = 0		
+		for title, record in to_print.items():
+				print '"{}" by {} ({})'.format(title, record[0], record[1]) 
+				count += 1
 
-	if count == 0:
-		print "Your have no unread books"
-
-def showAuthor(author):
-	count = 0
-	for title, record in library.items():
-		if record[0] == author:
-			print '"' + title + '" by ' + record[0] +  ' (' + record[1] + ')'
-			count += 1
-
-	if count == 0:
-		print "Your have no books by that author"
-
-
-def showUreadbyAuthor(author):
-	count = 0
-	for title, record in library.items():
-		if record[0] == author and record[1] == 'unread':
-			print '"' + title + '" by ' + record[0] +  ' (' + record[1] + ')'
-			count += 1
-
-	if count == 0:
-		print "Your have no unread books by that author"
+		if count == 0:
+			print 'Your have no {} books by "{}".'.format(status, author) 
 
 
 
-
-
-
-def main ():
+def main():
 
 	print "Welcome to your library!"
 
+	keywords =['add', 'read', 'show', 'all', 'unread', 'by', 'author', 'quit']
+	commands = ['add', 'read', 'show all', 'show unread', 'show all by', 'show unread by', 'quit']
+
 	while True:
+
 		input = shlex.split(raw_input("> "))
 
-		if input[0].lower() == 'quit':
+		command = ' '.join([i for i in input if i in keywords][:4])
+
+		if command not in commands:
+			print "Mmmm... I don't understand! Try another command"
+
+		elif command == 'quit':
 			break
 
-		elif input[0].lower() == 'add':
+		elif command == 'add':
 			try:
 				addBook(input[1], input[2])
 			except:
-				print "You need a title and an author"
+				print "You need a title and an author. Use quotation marks around Title and Author"
 				continue
 
-		elif input[0].lower() == 'read':
+		elif command == 'read':
 			markRead(input[1])
 
+		elif command == 'show all':
+			show('all', 'all')
 
-		elif input[0].lower() == 'show' and len(input) > 1:
+		elif command == 'show all by':
+			show('all', input[3])
 
-			if input[1].lower() == 'all':
+		elif command == 'show unread':
+			show('unread', 'all')
 
-				if len(input) == 4 and input[2].lower() == 'by':
-					showAuthor(input[3])
-				else:
-					showAll()
-			
-			elif input[1].lower() == 'unread':
-
-				if len(input)== 4 and input[2].lower() == 'by':
-					showUreadbyAuthor(input[3])
-				else:
-					showUnread()
-
-			else:
-				continue
+		elif command == 'show unread by':
+			show('unread', input[3])
 
 		else:
-			print "I don't understand. Try a different command."
-
-		print library
+			continue
 
 
+		#print library
 
-if __name__ == "__main__":
+
+
+if __name__ == '__main__':
     main()
-
 
 
 
