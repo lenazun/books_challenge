@@ -1,7 +1,18 @@
 #!/usr/bin/env python
 import shlex
 
-library = {}
+
+LIBRARY= []
+
+
+class Book:
+	def __init__(self, title, author):
+		self.title = title
+		self.author = author
+		self.status = 'unread'
+
+	def setStatus(self, status):
+		self.status = status
 
 
 def addBook(args):
@@ -13,12 +24,14 @@ def addBook(args):
 
 	title, author = args
 
-	if title not in library.keys():
-		library[title] = [author, 'unread']
+	exists = [x for x in LIBRARY if x.title == title]
+
+	if not exists:
+		title, author = args
+		LIBRARY.append(Book(title, author))
 		print 'Added "{}" by {}.'.format(title, author) 
 	else:
 		print 'The book "{}" is already in your library.'.format(title)
-
 
 
 def markRead(args):
@@ -29,8 +42,10 @@ def markRead(args):
 
 	title = args[0]
 
-	if title in library.keys():
-		library[title][1] = 'read'
+	exists = [x for x in LIBRARY if x.title == title]
+
+	if exists:
+		exists[0].setStatus('read')
 		print 'You\'ve read "{}".'.format(title) 
 	else:
 		print 'The book "{}" is not in your library. Add it first!'.format(title) 
@@ -54,24 +69,24 @@ def show(args):
 
 	status, author = args
 
-	if len(library.keys()) == 0:
+	if len(LIBRARY) == 0:
 		print "Your library is empty."
 
 	else:
 		#dictionary filters given the search criteria
 		if status != 'all' and author != 'all':
-			to_print = {title:record for (title, record) in library.iteritems() if record[0] == author and record[1] == status}
+			to_print = [x for x in LIBRARY if x.status == status and x.author == author]
 		elif author != 'all':
-			to_print = {title:record for (title, record) in library.iteritems() if record[0] == author}
+			to_print = [x for x in LIBRARY if x.author == author]
 		elif status != 'all':	
-			to_print = {title:record for (title, record) in library.iteritems() if record[1] == status}
+			to_print = [x for x in LIBRARY if x.status == status]
 
 		else:
-			to_print = library
+			to_print = LIBRARY
 
 		count = 0		
-		for title, record in to_print.items():
-				print '"{}" by {} ({})'.format(title, record[0], record[1]) 
+		for i in to_print:
+				print '"{}" by {} ({})'.format(i.title, i.author, i.status) 
 				count += 1
 
 		if count == 0:
@@ -136,6 +151,5 @@ if __name__ == '__main__':
 	# import doctest
 	# doctest.testmod()
     main()
-
 
 
