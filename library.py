@@ -5,27 +5,35 @@ import shlex
 library = {}
 
 
-def addBook(title, author):
+def addBook(args):
+
+	title, author = args
+
 	if title not in library.keys():
 		library[title] = [author, 'unread']
 		print 'Added "{}" by {}.'.format(title, author) 
 	else:
 		print 'The book "{}" is already in your library.'.format(title)
 
-def markRead(title):
+def markRead(args):
+
+	title = args[0]
+
 	if title in library.keys():
 		library[title][1] = 'read'
 		print 'You\'ve read "{}"'.format(title) 
 	else:
 		print 'The book "{}" is not in your library. Add it first!'.format(title) 
 
-def show(status, author):
+def show(args):
+
+	status, author = args
 
 	if len(library.keys()) == 0:
 		print "Your library is empty."
 
 	else:
-		if author != 'all' and status != 'all':
+		if status != 'all' and author != 'all':
 			to_print = {title:record for (title, record) in library.iteritems() if record[0] == author and record[1] == status}
 		elif author != 'all':
 			to_print = {title:record for (title, record) in library.iteritems() if record[0] == author}
@@ -44,47 +52,44 @@ def show(status, author):
 			print 'Your have no {} books by "{}".'.format(status, author) 
 
 
-
 def main():
 
 	print "Welcome to your library!"
 
-	keywords =['add', 'read', 'show', 'all', 'unread', 'by', 'author', 'quit']
-	commands = ['add', 'read', 'show all', 'show unread', 'show all by', 'show unread by', 'quit']
-
+	keywords =['add', 'read', 'show', 'by', 'quit']
+	
 	while True:
 
 		input = shlex.split(raw_input("> "))
 
-		command = ' '.join([i for i in input if i in keywords][:4])
+		action = ' '.join([i.lower() for i in input if i in keywords][:4])
 
-		if command not in commands:
+		commands = {'add': addBook,
+					'read': markRead,
+					'show': show,
+					'show by': show,
+					'quit' : ''
+					}
+
+		args = [i for i in input if i not in keywords]
+
+		if action == 'show' and len(args) == 1:
+			args.append('all')
+		
+		if action not in commands.keys():
 			print "Mmmm... I don't understand! Try another command"
 
-		elif command == 'quit':
+		elif action == 'quit':
 			break
 
-		elif command == 'add':
-			try:
-				addBook(input[1], input[2])
+		elif action:
+
+			try: 
+				commands[action](args)
+
 			except:
-				print "You need a title and an author. Use quotation marks around Title and Author"
+				print "Invalid input. Use quotation marks around sentences"
 				continue
-
-		elif command == 'read':
-			markRead(input[1])
-
-		elif command == 'show all':
-			show('all', 'all')
-
-		elif command == 'show all by':
-			show('all', input[3])
-
-		elif command == 'show unread':
-			show('unread', 'all')
-
-		elif command == 'show unread by':
-			show('unread', input[3])
 
 		else:
 			continue
