@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 import shlex
 
-library = {}
+#This version uses a dictionary to store the book info
+LIBRARY = {}
 
 
 def addBook(args):
@@ -13,8 +14,8 @@ def addBook(args):
 
 	title, author = args
 
-	if title not in library.keys():
-		library[title] = [author, 'unread']
+	if title not in LIBRARY.keys():
+		LIBRARY[title] = [author, 'unread']
 		print 'Added "{}" by {}.'.format(title, author) 
 	else:
 		print 'The book "{}" is already in your library.'.format(title)
@@ -29,8 +30,8 @@ def markRead(args):
 
 	title = args[0]
 
-	if title in library.keys():
-		library[title][1] = 'read'
+	if title in LIBRARY.keys():
+		LIBRARY[title][1] = 'read'
 		print 'You\'ve read "{}".'.format(title) 
 	else:
 		print 'The book "{}" is not in your library. Add it first!'.format(title) 
@@ -42,32 +43,29 @@ def show(args):
 	show all: displays all of the books in the library
 	>>> show(['all', 'all'])
 	"Moby Dick" by Herman Melville (read)
-
 	show unread: display all of the books that are unread
-	
 	show all by "$author": shows all of the books in the library by the given author.
 	>>> show(['all', 'Herman Melville'])
 	"Moby Dick" by Herman Melville (read)
-
 	show unread by "$author": shows the unread books in the library by the given author
 	"""
 
 	status, author = args
 
-	if len(library.keys()) == 0:
+	if len(LIBRARY.keys()) == 0:
 		print "Your library is empty."
 
 	else:
 		#dictionary filters given the search criteria
 		if status != 'all' and author != 'all':
-			to_print = {title:record for (title, record) in library.iteritems() if record[0] == author and record[1] == status}
+			to_print = {title:record for (title, record) in LIBRARY.iteritems() if record[0] == author and record[1] == status}
 		elif author != 'all':
-			to_print = {title:record for (title, record) in library.iteritems() if record[0] == author}
+			to_print = {title:record for (title, record) in LIBRARY.iteritems() if record[0] == author}
 		elif status != 'all':	
-			to_print = {title:record for (title, record) in library.iteritems() if record[1] == status}
+			to_print = {title:record for (title, record) in LIBRARY.iteritems() if record[1] == status}
 
 		else:
-			to_print = library
+			to_print = LIBRARY
 
 		count = 0		
 		for title, record in to_print.items():
@@ -88,12 +86,12 @@ def main():
 
 		try:
 			input = shlex.split(raw_input("> "))
-			
+
 		except ValueError, err:
 			print "Oh noes! There's an error: " + str(err)
 			continue
 
-		#splits the command from the imput, small dispatch table for functions
+		#splits the command from the input, small dispatch table for functions
 		action = ' '.join([i.lower() for i in input if i in keywords][:4])
 
 		commands = {'add': addBook,
@@ -103,7 +101,7 @@ def main():
 					'quit' : ''
 					}
 
-		#splits the argument from the imput and checks for empty strings/spaces
+		#splits the arguments from the input and checks for empty strings/spaces
 		args = [i for i in input if i not in keywords 
 								and i.isspace() == False
 								and i != '']
@@ -124,7 +122,7 @@ def main():
 				commands[action](args)
 
 			except:
-				print "Invalid input. Use quotation marks around sentences"
+				print "Invalid input. Remember to use quotation marks around sentences"
 				continue
 
 		else:

@@ -4,6 +4,7 @@ import shlex
 
 LIBRARY= []
 
+# This version uses a Book objects
 
 class Book:
 	def __init__(self, title, author):
@@ -90,7 +91,9 @@ def show(args):
 				count += 1
 
 		if count == 0:
-			print 'Your have no {} books by "{}".'.format(status, author) 
+			print 'Your have no books with that criteria.' 
+
+
 
 
 def main():
@@ -103,12 +106,12 @@ def main():
 
 		try:
 			input = shlex.split(raw_input("> "))
-			
+
 		except ValueError, err:
 			print "Oh noes! There's an error: " + str(err)
 			continue
 
-		#splits the command from the imput, small dispatch table for functions
+		#splits the command from the input, small dispatch table for functions
 		action = ' '.join([i.lower() for i in input if i in keywords][:4])
 
 		commands = {'add': addBook,
@@ -118,7 +121,7 @@ def main():
 					'quit' : ''
 					}
 
-		#splits the argument from the imput and checks for empty strings/spaces
+		#splits the arguments from the input and checks for empty strings/spaces
 		args = [i for i in input if i not in keywords 
 								and i.isspace() == False
 								and i != '']
@@ -139,7 +142,7 @@ def main():
 				commands[action](args)
 
 			except:
-				print "Invalid input. Use quotation marks around sentences"
+				print "Invalid input. Remember to use quotation marks around sentences"
 				continue
 
 		else:
@@ -151,5 +154,6 @@ if __name__ == '__main__':
 	# import doctest
 	# doctest.testmod()
     main()
+
 
 
