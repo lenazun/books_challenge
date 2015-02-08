@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 import shlex
 
-
 library = {}
 
 
 def addBook(args):
+	"""add "$title" "$author": adds a book to the library with the given title and author. 
+	All books are unread by default."""
 
 	title, author = args
 
@@ -15,7 +16,10 @@ def addBook(args):
 	else:
 		print 'The book "{}" is already in your library.'.format(title)
 
+
+
 def markRead(args):
+	"""read "$title": marks a given book as read."""
 
 	title = args[0]
 
@@ -25,7 +29,15 @@ def markRead(args):
 	else:
 		print 'The book "{}" is not in your library. Add it first!'.format(title) 
 
+
+
 def show(args):
+	"""
+	show all: displays all of the books in the library
+	show unread: display all of the books that are unread
+	show all by "$author": shows all of the books in the library by the given author.
+	show unread by "$author": shows the unread books in the library by the given author
+	"""
 
 	status, author = args
 
@@ -33,6 +45,7 @@ def show(args):
 		print "Your library is empty."
 
 	else:
+		#dictionary filters given the search criteria
 		if status != 'all' and author != 'all':
 			to_print = {title:record for (title, record) in library.iteritems() if record[0] == author and record[1] == status}
 		elif author != 'all':
@@ -62,6 +75,7 @@ def main():
 
 		input = shlex.split(raw_input("> "))
 
+		#splits the command from the imput, small dispatch table for functions
 		action = ' '.join([i.lower() for i in input if i in keywords][:4])
 
 		commands = {'add': addBook,
@@ -71,6 +85,7 @@ def main():
 					'quit' : ''
 					}
 
+		#splits the argument from the imput
 		args = [i for i in input if i not in keywords]
 
 		if action == 'show' and len(args) == 1:
@@ -79,6 +94,7 @@ def main():
 		if action not in commands.keys():
 			print "Mmmm... I don't understand! Try another command"
 
+		#quit: quits the program.
 		elif action == 'quit':
 			break
 
@@ -95,21 +111,10 @@ def main():
 			continue
 
 
-		#print library
-
 
 
 if __name__ == '__main__':
     main()
 
 
-
-
-# add "$title" "$author": adds a book to the library with the given title and author. All books are unread by default.
-# read "$title": marks a given book as read.
-# show all: displays all of the books in the library
-# show unread: display all of the books that are unread
-# show all by "$author": shows all of the books in the library by the given author.
-# show unread by "$author": shows the unread books in the library by the given author
-# quit: quits the program.
 
