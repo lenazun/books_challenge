@@ -1,19 +1,8 @@
 #!/usr/bin/env python
 import shlex
 
-
-LIBRARY= []
-
-# This version uses a Book objects
-
-class Book:
-	def __init__(self, title, author):
-		self.title = title
-		self.author = author
-		self.status = 'unread'
-
-	def setStatus(self, status):
-		self.status = status
+#This version uses a dictionary to store the book info
+LIBRARY = {}
 
 
 def addBook(args):
@@ -25,14 +14,12 @@ def addBook(args):
 
 	title, author = args
 
-	exists = [book for book in LIBRARY if book.title == title]
-
-	if not exists:
-		title, author = args
-		LIBRARY.append(Book(title, author))
+	if title not in LIBRARY.keys():
+		LIBRARY[title] = [author, 'unread']
 		print 'Added "{}" by {}.'.format(title, author) 
 	else:
 		print 'The book "{}" is already in your library.'.format(title)
+
 
 
 def markRead(args):
@@ -43,10 +30,8 @@ def markRead(args):
 
 	title = args[0]
 
-	exists = [book for book in LIBRARY if book.title == title]
-
-	if exists:
-		exists[0].setStatus('read')
+	if title in LIBRARY.keys():
+		LIBRARY[title][1] = 'read'
 		print 'You\'ve read "{}".'.format(title) 
 	else:
 		print 'The book "{}" is not in your library. Add it first!'.format(title) 
@@ -58,42 +43,37 @@ def show(args):
 	show all: displays all of the books in the library
 	>>> show(['all', 'all'])
 	"Moby Dick" by Herman Melville (read)
-
 	show unread: display all of the books that are unread
-	
 	show all by "$author": shows all of the books in the library by the given author.
 	>>> show(['all', 'Herman Melville'])
 	"Moby Dick" by Herman Melville (read)
-
 	show unread by "$author": shows the unread books in the library by the given author
 	"""
 
 	status, author = args
 
-	if len(LIBRARY) == 0:
+	if len(LIBRARY.keys()) == 0:
 		print "Your library is empty."
 
 	else:
 		#dictionary filters given the search criteria
 		if status != 'all' and author != 'all':
-			to_print = [book for book in LIBRARY if book.status == status and book.author == author]
+			to_print = {title:record for (title, record) in LIBRARY.iteritems() if record[0] == author and record[1] == status}
 		elif author != 'all':
-			to_print = [book for book in LIBRARY if book.author == author]
+			to_print = {title:record for (title, record) in LIBRARY.iteritems() if record[0] == author}
 		elif status != 'all':	
-			to_print = [book for book in LIBRARY if book.status == status]
+			to_print = {title:record for (title, record) in LIBRARY.iteritems() if record[1] == status}
 
 		else:
 			to_print = LIBRARY
 
 		count = 0		
-		for book in to_print:
-				print '"{}" by {} ({})'.format(book.title, book.author, book.status) 
+		for title, record in to_print.items():
+				print '"{}" by {} ({})'.format(title, record[0], record[1]) 
 				count += 1
 
 		if count == 0:
-			print 'Your have no books with this criteria.' 
-
-
+			print 'Your have no {} books by "{}".'.format(status, author) 
 
 
 def main():
@@ -134,7 +114,6 @@ def main():
 
 		#quit: quits the program.
 		elif action == 'quit':
-			print 'Bye!'
 			break
 
 		elif action:
@@ -152,9 +131,9 @@ def main():
 
 
 if __name__ == '__main__':
-	# import doctest  #uncomment these 2 lines to test with Docstrings. use -v for verbose
+	# import doctest
 	# doctest.testmod()
-    main()  # comment out this line when testing
+    main()
 
 
 
